@@ -2,7 +2,7 @@ name: otel_recharge
 description: >-
   OpenTelemetry instrumentation for recharge by Dartastic.io. Adds standard
   OpenTelemetry observability to applications that use recharge.
-version: 0.1.0-wip
+version: 0.1.0
 repository: https://github.com/dartastic/otel_recharge
 homepage: https://dartastic.io
 
