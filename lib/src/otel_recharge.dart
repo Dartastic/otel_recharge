@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_recharge_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_recharge';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class RechargeResult {
+  /// Creates a result.
   const RechargeResult({
     this.itemCount,
     this.totalCount,
@@ -62,8 +63,13 @@ class RechargeResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class RechargeCallResult<T> {
+  /// Creates a call result.
   const RechargeCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final RechargeResult? result;
 }
@@ -95,38 +101,38 @@ Future<T> tracedRecharge<T>({
   final span = _tracer().startSpan(
     'recharge $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
     if (r.result != null) {
       final extras = <Attribute<Object>>[];
       if (r.result!.itemCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'recharge.item_count',
           r.result!.itemCount!,
         ));
       }
       if (r.result!.totalCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'recharge.total_count',
           r.result!.totalCount!,
         ));
       }
       if (r.result!.apiVersion != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'recharge.api_version',
           r.result!.apiVersion!,
         ));
       }
       if (r.result!.subscriptionStatus != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'recharge.subscription.status',
           r.result!.subscriptionStatus!,
         ));
       }
       if (r.result!.chargeStatus != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'recharge.charge.status',
           r.result!.chargeStatus!,
         ));
@@ -138,43 +144,43 @@ Future<T> tracedRecharge<T>({
         }
       }
       if (r.result!.cycleNumber != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'recharge.cycle_number',
           r.result!.cycleNumber!,
         ));
       }
       if (r.result!.intervalUnit != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'recharge.interval.unit',
           r.result!.intervalUnit!,
         ));
       }
       if (r.result!.intervalCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'recharge.interval.count',
           r.result!.intervalCount!,
         ));
       }
       if (r.result!.amountMinor != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'recharge.amount.minor',
           r.result!.amountMinor!,
         ));
       }
       if (r.result!.currency != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'recharge.currency',
           r.result!.currency!,
         ));
       }
       if (r.result!.requestId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'recharge.request.id',
           r.result!.requestId!,
         ));
       }
       if (r.result!.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           r.result!.statusCode!,
         ));
@@ -185,13 +191,13 @@ Future<T> tracedRecharge<T>({
           );
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
